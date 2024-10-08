@@ -19,27 +19,39 @@ const schema = z.object({
   email: z.string().trim().email('Email inválido!'),
   company: z.string().trim().min(1, 'Campo obrigatório!'),
   dateOfBirth: z.object({
-    day: z.string({ required_error: 'Obrigatório!' }),
-    month: z.string({ required_error: 'Obrigatório!' }),
-    year: z.string({ required_error: 'Obrigatório!' }),
+    day: z.string({ required_error: 'Obrigatório!' }).min(1, 'Obrigatório!'),
+    month: z.string({ required_error: 'Obrigatório!' }).min(1, 'Obrigatório!'),
+    year: z.string({ required_error: 'Obrigatório!' }).min(1, 'Obrigatório!'),
   }),
 })
 
 type formData = z.infer<typeof schema>
 
 export const App = () => {
-  const { handleSubmit, register, formState, control } = useForm<formData>({
-    resolver: zodResolver(schema),
-  })
+  const { handleSubmit, register, formState, control, reset } =
+    useForm<formData>({
+      resolver: zodResolver(schema),
+    })
   const onSubmit = (data: formData) => {
     console.log(data)
+    reset({
+      firstname: '',
+      lastname: '',
+      email: '',
+      company: '',
+      dateOfBirth: {
+        day: '',
+        month: '',
+        year: '',
+      },
+    })
     alert(
       `CADASTRADO COM SUCESSO! ${new Date().getFullYear()} \n\r Nome: ${data.firstname} \n\r Sobrenome: ${data.lastname} \n\r E-mail: ${data.email} \n\r Empresa: ${data.company} \n\r Nascimento: ${data.dateOfBirth.day}/${data.dateOfBirth.month}/${data.dateOfBirth.year} \n\r Idade: ${new Date().getFullYear() - +data.dateOfBirth.year} anos.`
     )
   }
 
   return (
-    <main className="bg-zinc-900 text-zinc-50 w-full h-screen flex justify-center items-center p-2">
+    <main className="bg-zinc-900 text-zinc-50 w-full min-h-screen flex justify-center items-center p-6">
       <div className="w-full max-w-xl bg-zinc-700 rounded-sm p-4">
         <h1 className="text-2xl font-bold text-center">Registre-se</h1>
         <form
@@ -116,33 +128,31 @@ export const App = () => {
             </div>
           </div>
           <div className="grid grid-cols-3 gap-4">
+            <h3 className="grid col-span-3 -mb-4">Aniversário:</h3>
             <div>
-              <Label>
-                Dia:
-                <Controller
-                  name="dateOfBirth.day"
-                  control={control}
-                  render={({ field }) => (
-                    <Select onValueChange={field.onChange}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecionar" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Array(31)
-                          .fill(1)
-                          .map((_, index) => {
-                            const value = String(index + 1).padStart(2, '0')
-                            return (
-                              <SelectItem key={String(index + 1)} value={value}>
-                                {value}
-                              </SelectItem>
-                            )
-                          })}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              </Label>
+              <Controller
+                name="dateOfBirth.day"
+                control={control}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Dia" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Array(31)
+                        .fill(1)
+                        .map((_, index) => {
+                          const value = String(index + 1).padStart(2, '0')
+                          return (
+                            <SelectItem key={String(index + 1)} value={value}>
+                              {value}
+                            </SelectItem>
+                          )
+                        })}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
               {formState.errors.dateOfBirth?.day?.message && (
                 <span className="text-sm text-red-400">
                   {formState.errors.dateOfBirth?.day.message}
@@ -150,32 +160,29 @@ export const App = () => {
               )}
             </div>
             <div>
-              <Label>
-                Mẽs:
-                <Controller
-                  name="dateOfBirth.month"
-                  control={control}
-                  render={({ field }) => (
-                    <Select onValueChange={field.onChange}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecionar" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Array(12)
-                          .fill(1)
-                          .map((_, index) => {
-                            const value = String(index + 1).padStart(2, '0')
-                            return (
-                              <SelectItem key={String(index + 1)} value={value}>
-                                {value}
-                              </SelectItem>
-                            )
-                          })}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              </Label>
+              <Controller
+                name="dateOfBirth.month"
+                control={control}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Mẽs" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Array(12)
+                        .fill(1)
+                        .map((_, index) => {
+                          const value = String(index + 1).padStart(2, '0')
+                          return (
+                            <SelectItem key={String(index + 1)} value={value}>
+                              {value}
+                            </SelectItem>
+                          )
+                        })}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
               {formState.errors.dateOfBirth?.month?.message && (
                 <span className="text-sm text-red-400">
                   {formState.errors.dateOfBirth.month.message}
@@ -183,32 +190,29 @@ export const App = () => {
               )}
             </div>
             <div>
-              <Label>
-                Ano:
-                <Controller
-                  name="dateOfBirth.year"
-                  control={control}
-                  render={({ field }) => (
-                    <Select onValueChange={field.onChange}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecionar" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Array(200)
-                          .fill(1)
-                          .map((_, index) => {
-                            const value = String(index + 1901).padStart(2, '0')
-                            return (
-                              <SelectItem key={String(index + 1)} value={value}>
-                                {value}
-                              </SelectItem>
-                            )
-                          })}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              </Label>
+              <Controller
+                name="dateOfBirth.year"
+                control={control}
+                render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Ano" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Array(200)
+                        .fill(1)
+                        .map((_, index) => {
+                          const value = String(index + 1901).padStart(2, '0')
+                          return (
+                            <SelectItem key={String(index + 1)} value={value}>
+                              {value}
+                            </SelectItem>
+                          )
+                        })}
+                    </SelectContent>
+                  </Select>
+                )}
+              />
               {formState.errors.dateOfBirth?.year?.message && (
                 <span className="text-sm text-red-400">
                   {formState.errors.dateOfBirth?.year.message}
